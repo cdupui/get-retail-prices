@@ -1,19 +1,15 @@
 # get-retail-prices
 ## Purpose
-Azure Automation runbook to collect and Store Azure Retail Prices.
+Azure Automation runbook to collect and store Azure Reservation prices.
 
-This runbook will raise an alert to a dedicated Teams channel if a reservation usage is below a specified threshold.
+[Azure Retail Prices API](https://docs.microsoft.com/en-us/rest/api/cost-management/retail-prices/azure-retail-prices) is givingg access to all Azures prices (Reservations, Spots, Dev/Test, ...). But this API is paginated and thus cannot be easily integrated in reporting tools with connectors.
 
-All reservations in current directory will be checked. 
+To solve it, this runbook will:
+ - Call [Azure Retail Prices API](https://docs.microsoft.com/en-us/rest/api/cost-management/retail-prices/azure-retail-prices) to collect data
+ - Filter on Reservations prices with EUR currency
+ - Store results in a CSV file in Azure Blob Storage  
 
 ## Prerequisites
-### Configure Teams Channel
-Reservation alerts will be sent to a Teams channel using Teams APIs.
-
-You need to enable this feature on Channel using Incoming Webook connector see [Teams connectors documentation](https(https://docs.microsoft.com/en-us/microsoteams/platform/webhooks-and-connectors/how-to/)add-incoming-webhook#create-an-incoming-webhook-1)
-
-Copy generated URL to provide it as a parameter to Azure Automation runbook (will be referenced as `TeamsChannelUrl`)  
-
 ### Create and configure Azure Automation Account
 Use your favorite method to create a new Azure Automation Account:
 - [Azure Portal](https://docs.microsoft.com/en-us/azure/automation/automation-create-standalone-account?tabs=azureportal#create-a-new-automation-account-in-the-azure-portal) 
@@ -31,43 +27,37 @@ Run As accounts in Azure Automation provides authentication for managing resourc
 
 Follow [Azure Automation Account documentation](https(https://docs.microsoft.com/en-us/azure/automatiocreate-run-as-account#create-account-in-azu)re-portal) to create an Automation Account using Azure Portal (easiest way) 
 
-
 ### Set "Run as Account" permissions
-- **Set global permission**
+By default, Run as Account Service Principal will get `Contributor` permission but we only need `Storage Blob Data Contributor` permission.
 
-By default, Run as Account Service Principal will get `Contributor` permission but we only need `Reader` permission.
-
-These Powershell commands will remove `Contributor` and set `Reader` permissions on Azure Automation Service Principal (aka Run As Account):
+These Powershell commands will remove `Contributor` and set `Storage Blob Data Contributor` permissions on Azure Automation Service Principal (aka Run As Account):
 ```console
-Remove-AzRoleAssignment -PrincipalId "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxx" -RoleDefinition "Contributor"
+Remove-AzRoleAssignment -PrincipalId "517a32bf-b44d-475e-a635-91209a190f34" -RoleDefinitionName "Contributor" 517a32bf-b44d-475e-a635-91209a190f34
 
-New-AzRoleAssignment -PrincipalId "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxx" -RoleDefinitionName "Reader"
+New-AzRoleAssignment -PrincipalId "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxx" -RoleDefinitionName "Storage Blob Data Contributor"
 ```
 
 *You can easily find Service Principal ID in Run as Account blade on Azure Portal*
 
 ![onfigure](images/run_as_account_spn.jpg)
 
- - **Set reservations permission**
-
-To list all reservations, we use `Reservations Reader` permission, it gives read-only access to reservations in current Azure Active Directory tenant (directory) see [View/Manage Reservations documentation](https://docs.microsoft.com/en-us/azure/cost-management-billing/reservations/view-reservations#assign-a-reservation-reader-role-at-the-tenant-level)  
-
-To set this permission, you must  be authentucated as a **Global Admin with elevated privilieges** See [Azure AD documentation](https://docs.microsoft.com/en-us/azure/role-based-access-control/elevate-access-global-admin)
-
-This Powershell commands will set `Reservations Reader` permission on Azure Automation Service Principal (aka Run As Account):
-```console
-New-AzRoleAssignment -Scope "/providers/Microsoft.Capacity" -PrincipalId "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxx" -RoleDefinitionName "Reservations Reader"
-```
-
 ### Configure Automation Account 
-Define 2 variables
- - `TeamsChannelUrl` = URL to get access to Teams Incoming Webook connector (created earlier)
+Define variables:
+ - `StorageAccountName` = Name of the Storage Account to store retail price CSV file 
 ```console 
-New-AzAutomationVariable -AutomationAccountName "myAutomationAccount" -Name "TeamsChannelUrl" -Encrypted $False -Value "http://your-url" -ResourceGroupName "RG-CDU"
+New-AzAutomationVariable -AutomationAccountName "myAutomationAccount" -Name "StorageAccountName" -Encrypted $False -Value "myStorageAccountName" -ResourceGroupName "RG-CDU"
 ```
- - `UsageThreshold` = Reservation Usage Percentage above which alerts will be sent 
+ - `ContainerName` = Name of the Container (inside Storage Account) to store retail price CSV file 
 ```console
-New-AzAutomationVariable -AutomationAccountName "myAutomationAccount" -Name "UsageThreshold" -Encrypted $False -Value 80 -ResourceGroupName "RG-CDU"
+New-AzAutomationVariable -AutomationAccountName "myAutomationAccount" -Name "ContainerName" -Encrypted $False -Value "myContainerName" -ResourceGroupName "RG-CDU"
+```
+ - `ContainerName` = Name of the Container (inside Storage Account) to store retail price CSV file 
+```console
+New-AzAutomationVariable -AutomationAccountName "myAutomationAccount" -Name "ContainerName" -Encrypted $False -Value "myContainerName" -ResourceGroupName "RG-CDU"
+```
+ - `Currency` = Currency for returned price list  
+```console
+New-AzAutomationVariable -AutomationAccountName "myAutomationAccount" -Name "Currency" -Encrypted $False -Value "EUR" -ResourceGroupName "RG-CDU"
 ```
 
 ## Deploy
