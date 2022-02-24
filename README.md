@@ -64,13 +64,13 @@ New-AzAutomationVariable -AutomationAccountName "myAutomationAccount" -Name "Cur
 ### Create Powershell runbook
 Download Powershell script:
 ```console
-wget https://github.com/cdupui/reservation-alerts/blob/main/reservation-alerts.ps1   
+wget https://github.com/cdupui/get-retail-prices/blob/main/retail_prices.ps1  
 ```
 
-Go to the directory where you downloaded `reservation-alerts.ps1` and execute Powershell command to create and deploy Azure Automation Powershell runbook: 
+Go to the directory where you downloaded `retail_prices.ps1` and execute Powershell command to create and deploy Azure Automation Powershell runbook: 
 ```console
 $importParams = @{
-    Path = "reservation-alerts.ps1"
+    Path = "retail_prices.ps1"
     ResourceGroupName = "RG-CDU"
     AutomationAccountName = "myAutomationAccount"
     Type = "PowerShell"
@@ -82,13 +82,11 @@ In Azure Portal, Go to the runbook Editor see [Edit runbook documentation](https
 
 Then use Test Pane to execute runbook and check results see [Test runbook documentation](https://docs.microsoft.com/en-us/azure/automation/manage-runbooks#test-a-runbook) 
 
-If a reservation usage is below specified threshold you should see an alert message in Teams channel
-
-![onfigure](images/reservation-alert.jpg)
+If execution is fin you should see the CSV file containing Reservation Prices in `Storage Account / Container`  
 
 ## Finalize runbook execution
 ### Publish runbook
 If all tests are fine, you have to publish your runbook to finalize deployment see [Publish runbook documentation](https://docs.microsoft.com/en-us/azure/automation/manage-runbooks#publish-a-runbook)  
 
 ### Schedule execution
-Last optional (but recommended) step is to schedule this runbook to get daily alerts if your reservations are not used as expected see [Schedule runbook documentation](https://docs.microsoft.com/en-us/azure/automation/manage-runbooks#schedule-a-runbook-in-the-azure-portal) 
+Last optional step is to schedule this runbook to get up-to-date reservation prices (to be scheduled monthly since theses prices are not often updated) see [Schedule runbook documentation](https://docs.microsoft.com/en-us/azure/automation/manage-runbooks#schedule-a-runbook-in-the-azure-portal) 
