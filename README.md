@@ -99,7 +99,7 @@ In Azure Portal, Go to the runbook Editor see [Edit runbook documentation](https
 
 Then use Test Pane to execute runbook and check results see [Test runbook documentation](https://docs.microsoft.com/en-us/azure/automation/manage-runbooks#test-a-runbook) 
 
-If execution is fin you should see the CSV file containing Reservation Prices in `Storage Account / Container`  
+If execution is OK you should see the CSV file containing Reservation Prices in `Storage Account / Container`  
 
 ## Finalize runbook execution
 ### Publish runbook
