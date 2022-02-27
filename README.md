@@ -10,6 +10,22 @@ To solve it, this runbook will:
  - Store results in a CSV file in Azure Blob Storage  
 
 ## Prerequisites
+### Create Azure Storage Account and Container
+ - Create Azure Storage Account (or use an existing one)
+
+Sample with Powershell:
+```console
+New-AzStorageAccount -Name "mycdustorageaccount" -Location "North Europe" -ResourceGroupName "RG-CDU" -SkuName Standard_RAGRS -Kind StorageV2
+```
+
+ - Create a container inside Azure Storage Account to store CSV file
+
+Sample with Powershell:
+```console
+$ctx = New-AzStorageContext -StorageAccountName "mycdustorageaccount" -UseConnectedAccount
+New-AzStorageContainer -Name "mycdustoragecontainer" -Context $ctx
+```
+
 ### Create and configure Azure Automation Account
 Use your favorite method to create a new Azure Automation Account:
 - [Azure Portal](https://docs.microsoft.com/en-us/azure/automation/automation-create-standalone-account?tabs=azureportal#create-a-new-automation-account-in-the-azure-portal) 
