@@ -36,14 +36,14 @@ $FilePath = $env:TEMP+"\"+$FileName
 $Uri = "https://prices.azure.com/api/retail/prices?currencyCode='"+$Currency+"'&`$filter=pricetype eq 'Reservation'"
 $Prices = Invoke-WebRequest -Method GET -UseBasicParsing -ContentType "application/json" -Uri $Uri -Headers $Headers | ConvertFrom-Json
 $Prices.Items | ConvertTo-Csv -NoTypeInformation | Out-File -Append -FilePath $FilePath
-<#$NextLink = $Prices.NextPageLink
+$NextLink = $Prices.NextPageLink
 
-While ($NextLink -ne $Null) {
+While ($Null -ne $NextLink) {
    $Prices = Invoke-WebRequest -Method GET -UseBasicParsing -ContentType "application/json" -Uri $NextLink -Headers $Headers | ConvertFrom-Json
    $Prices.Items | ConvertTo-Csv -NoTypeInformation | Select-Object -skip 1 | Out-File -Append -FilePath $FilePath
    $NextLink = $Prices.NextPageLink
    $NextLink
-}#>
+}
 
 $context=New-AzStorageContext -StorageAccountName $StorageAccountName -UseConnectedAccount
 

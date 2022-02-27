@@ -61,31 +61,32 @@ New-AzRoleAssignment -PrincipalId "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxx" -RoleDefini
 Define variables:
  - `StorageAccountName` = Name of the Storage Account to store retail price CSV file 
 ```console 
-New-AzAutomationVariable -AutomationAccountName "myAutomationAccount" -Name "StorageAccountName" -Encrypted $False -Value "myStorageAccountName" -ResourceGroupName "RG-CDU"
+New-AzAutomationVariable -AutomationAccountName "myAutomationAccount" -Name "StorageAccountName" -Encrypted $False -Value "mycdustorageaccount" -ResourceGroupName "RG-CDU"
 ```
  - `ContainerName` = Name of the Container (inside Storage Account) to store retail price CSV file 
 ```console
-New-AzAutomationVariable -AutomationAccountName "myAutomationAccount" -Name "ContainerName" -Encrypted $False -Value "myContainerName" -ResourceGroupName "RG-CDU"
+New-AzAutomationVariable -AutomationAccountName "myAutomationAccount" -Name "ContainerName" -Encrypted $False -Value "mycdustoragecontainer" -ResourceGroupName "RG-CDU"
 ```
- - `ContainerName` = Name of the Container (inside Storage Account) to store retail price CSV file 
+ - `RetailPricesCsvFileNamePrefix` = Prefix for retail price CSV file 
 ```console
-New-AzAutomationVariable -AutomationAccountName "myAutomationAccount" -Name "ContainerName" -Encrypted $False -Value "myContainerName" -ResourceGroupName "RG-CDU"
+New-AzAutomationVariable -AutomationAccountName "myAutomationAccount" -Name "RetailPricesCsvFileNamePrefix" -Encrypted $False -Value "retail_prices_" -ResourceGroupName "RG-CDU"
 ```
  - `Currency` = Currency for returned price list  
 ```console
-New-AzAutomationVariable -AutomationAccountName "myAutomationAccount" -Name "Currency" -Encrypted $False -Value "EUR" -ResourceGroupName "RG-CDU"
+New-AzAutomationVariable -AutomationAccountName "myAutomationAccount2" -Name "Currency" -Encrypted $False -Value "EUR" -ResourceGroupName "RG-CDU"
 ```
 
 ## Deploy
 ### Create Powershell runbook
 Download Powershell script:
 ```console
-wget https://github.com/cdupui/get-retail-prices/blob/main/retail_prices.ps1  
+wget https://raw.githubusercontent.com/cdupui/get-retail-prices/main/retail_prices.ps1
 ```
 
 Go to the directory where you downloaded `retail_prices.ps1` and execute Powershell command to create and deploy Azure Automation Powershell runbook: 
 ```console
 $importParams = @{
+    Name = "GetRetailPrices"
     Path = "retail_prices.ps1"
     ResourceGroupName = "RG-CDU"
     AutomationAccountName = "myAutomationAccount"
