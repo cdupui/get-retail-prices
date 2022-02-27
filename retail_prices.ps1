@@ -3,6 +3,7 @@
 $StorageAccountName = Get-AutomationVariable -Name "StorageAccountName"  
 $ContainerName = Get-AutomationVariable -Name "ContainerName"
 $RetailPricesCsvFileNamePrefix = Get-AutomationVariable -Name "RetailPricesCsvFileNamePrefix"
+$Currency = Get-AutomationVariable -Name "Currency"
 
 # Connect with Run As Account Service Principal
 # Will be replace by Managed Identity late around (Still in Preview)
@@ -32,7 +33,7 @@ $Timestamp = Get-Date -Format o | ForEach-Object { $_ -replace ":", "." }
 $FileName = $RetailPricesCsvFileNamePrefix+$Timestamp+".csv"
 $FilePath = $env:TEMP+"\"+$FileName
 
-$Uri = "https://prices.azure.com/api/retail/prices?currencyCode='EUR'&`$filter=pricetype eq 'Reservation'"
+$Uri = "https://prices.azure.com/api/retail/prices?currencyCode='"+$Currency+"'&`$filter=pricetype eq 'Reservation'"
 $Prices = Invoke-WebRequest -Method GET -UseBasicParsing -ContentType "application/json" -Uri $Uri -Headers $Headers | ConvertFrom-Json
 $Prices.Items | ConvertTo-Csv -NoTypeInformation | Out-File -Append -FilePath $FilePath
 <#$NextLink = $Prices.NextPageLink
