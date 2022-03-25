@@ -2,7 +2,7 @@
 ## Purpose
 Azure Automation runbook to collect and store Azure Reservation prices.
 
-[Azure Retail Prices API](https://docs.microsoft.com/en-us/rest/api/cost-management/retail-prices/azure-retail-prices) is givingg access to all Azures prices (Reservations, Spots, Dev/Test, ...). But this API is paginated and thus cannot be easily integrated in reporting tools with connectors.
+[Azure Retail Prices API](https://docs.microsoft.com/en-us/rest/api/cost-management/retail-prices/azure-retail-prices) is giving access to all Azures prices (Reservations, Spots, Dev/Test, ...). But this API is paginated and thus cannot be easily integrated in reporting tools with connectors.
 
 To solve it, this runbook will:
  - Call [Azure Retail Prices API](https://docs.microsoft.com/en-us/rest/api/cost-management/retail-prices/azure-retail-prices) to collect data
